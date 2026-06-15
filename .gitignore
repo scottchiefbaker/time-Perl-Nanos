@@ -1,0 +1,15 @@
+*.gz
+Makefile.old
+Makefile
+.build/
+_build/
+cover_db/
+blib/
+inc/
+Hrtime.bs
+Hrtime.c
+Hrtime.o
+pm_to_blib
+MYMETA.*
+Hrtime.def
+none/
