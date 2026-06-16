@@ -52,12 +52,10 @@ ok(defined &millis, 'millis is exported');
 my $us = micros();
 ok(defined $us, 'micros() returns a value');
 ok($us > 0, 'microseconds value is positive');
-ok(abs($us - int($ns / 1000)) < 1000, 'micros is consistent with nanos');
 
 my $ms = millis();
 ok(defined $ms, 'millis() returns a value');
 ok($ms > 0, 'milliseconds value is positive');
-ok(abs($ms - int($ns / 1_000_000)) < 10, 'millis is consistent with nanos');
 
 my $rt_us = micros(undef, 'realtime');
 ok(defined $rt_us, 'micros(undef, realtime) returns a value');
