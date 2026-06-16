@@ -2,6 +2,9 @@
 use strict;
 use warnings;
 use Time::Nanos;
+use v5.16;
+
+my $st = stopwatch(1);
 
 #print "Using Time::Nanos " . $Time::Nanos::VERSION . "\n\n";
 printf("Using %s %s\n\n", color('white', 'Time::Nanos'), color(228, $Time::Nanos::VERSION));
@@ -46,6 +49,13 @@ for (1 .. 4) {
 	printf "Time (monotonic): %s milliseconds\n", $ms;
 }
 
+my $total = stopwatch();
+print "\n";
+printf("Script executed in %d ns\n", $total);
+
+################################################################################
+################################################################################
+
 # String format: '115', '165_bold', '10_on_140', 'reset', 'on_173', 'red', 'white_on_blue'
 sub color {
 	my ($str, $txt) = @_;
@@ -73,6 +83,23 @@ sub color {
 	my $ret = "\e[" . join(";", @parts) . "m";
 
 	if (defined($txt)) { $ret .= $txt . "\e[0m"; }
+
+	return $ret;
+}
+
+# Stopwatch(1) = start
+# Stopwatch()  = return ns from start time
+sub stopwatch {
+	my $start         = shift();
+	state $last_start = undef;
+	my $ret;
+
+	if ($start) {
+		$last_start = nanos();
+		$ret        = $last_start;
+	} else {
+		$ret = nanos() - $last_start;
+	}
 
 	return $ret;
 }
