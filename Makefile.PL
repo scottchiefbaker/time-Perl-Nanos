@@ -40,8 +40,8 @@ if ($has_cgt) {
 }
 
 WriteMakefile(
-    NAME         => 'Time::Hrtime',
-    VERSION_FROM => 'lib/Time/Hrtime.pm',
+    NAME         => 'Time::Nanos',
+    VERSION_FROM => 'lib/Time/Nanos.pm',
     LIBS         => [$libs],
     DEFINE       => $define,
     ABSTRACT     => 'High resolution time via clock_gettime(CLOCK_MONOTONIC)',

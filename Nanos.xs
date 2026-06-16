@@ -9,7 +9,7 @@
 #include <stdint.h>
 #endif
 
-MODULE = Time::Hrtime    PACKAGE = Time::Hrtime
+MODULE = Time::Nanos    PACKAGE = Time::Nanos
 
 PROTOTYPES: DISABLE
 

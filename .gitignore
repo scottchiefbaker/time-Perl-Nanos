@@ -6,10 +6,10 @@ _build/
 cover_db/
 blib/
 inc/
-Hrtime.bs
-Hrtime.c
-Hrtime.o
+Nanos.bs
+Nanos.c
+Nanos.o
 pm_to_blib
 MYMETA.*
-Hrtime.def
+Nanos.def
 none/
