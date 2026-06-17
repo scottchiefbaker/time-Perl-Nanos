@@ -11,13 +11,7 @@ my $libs   = "";
 if ($^O eq 'MSWin32') {
     $define = "-DHAS_WINHR";
 } else {
-    my $probe_c = <<'C';
-#include <time.h>
-int main(void) {
-    struct timespec ts;
-    return clock_gettime(CLOCK_MONOTONIC, &ts);
-}
-C
+    my $probe_c = "#include <time.h>\nint main(void) {\n    struct timespec ts;\n    return clock_gettime(CLOCK_MONOTONIC, &ts);\n}\n";
 
     my $has_cgt = 0;
 
