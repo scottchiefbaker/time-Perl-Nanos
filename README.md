@@ -8,10 +8,10 @@ Time::Nanos - Nanosecond time resolution via clock\_gettime().
 use Time::Nanos;
 
 my $nanoseconds             = nanos();
-my ($seconds, $nanoseconds) = nanos(1);
-
 my $microseconds            = micros();
 my $milliseconds            = millis();
+
+my ($seconds, $nanoseconds) = nanos(1);
 ```
 
 ## Functions
@@ -23,8 +23,8 @@ my $ns = nanos();
 my ($sec, $nsec) = nanos(1);
 ```
 
-Returns nanoseconds. In scalar context returns total nanoseconds. In list context
-returns (seconds, nanoseconds).
+Returns nanoseconds. In scalar context returns total nanoseconds. With optional
+second param returns a list of (seconds, nanoseconds) instead.
 
 Accepts optional arguments: `nanos($list, $clock)` where `$list` selects list
 context and `$clock` is `'monotonic'` (default) or `'realtime'`.
@@ -49,20 +49,25 @@ Returns milliseconds as an integer. Accepts optional clock argument:
 
 ## Description
 
-Returns high resolution time via `clock_gettime()`.
+This module provides high-resolution time via `clock_gettime()`. The clock
+reference epoch is unspecified, so a single reading is not in itself a useful
+measurement of wall-clock time. These values are only meaningful when compared
+against each other to measure elapsed time.
 
-By default uses `CLOCK_MONOTONIC`. Pass a second argument to select the clock:
-`'monotonic'` or `'realtime'`.
+The default clock is `CLOCK_MONOTONIC`. An optional argument selects the
+clock: `'monotonic'` or `'realtime'`. `'realtime'` measures the system's
+uptime but is susceptible to clock skew from user clock changes, NTP updates,
+etc. When using `'realtime'`, it is possible (but rare) to observe a negative
+duration when comparing two successive calls.
 
 ## Usage
 
 ```
 nanos()                       # CLOCK_MONOTONIC, nanoseconds
-nanos(1)                      # CLOCK_MONOTONIC, list (sec, nsec)
-
 micros()                      # CLOCK_MONOTONIC, microseconds
 millis()                      # CLOCK_MONOTONIC, milliseconds
 
+nanos(1)                      # CLOCK_MONOTONIC, list (sec, nsec)
 nanos(undef, 'realtime')      # CLOCK_REALTIME, nanoseconds
 nanos(1, 'realtime')          # CLOCK_REALTIME, list (sec, nsec)
 

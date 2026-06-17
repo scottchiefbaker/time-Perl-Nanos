@@ -63,16 +63,16 @@ C<millis(undef, 'realtime')>.
 
 =head1 DESCRIPTION
 
-Returns high resolution time via C<clock_gettime()>. Timing is in reference to
-an unknown epoch, so by itself it is not a useful measurement of time. These
-timings are only useful when compared against each other to measure the passing
-of time.
+This module provides high-resolution time via C<clock_gettime()>. The clock
+reference epoch is unspecified, so a single reading is not in itself a useful
+measurement of wall-clock time. These values are only meaningful when compared
+against each other to measure elapsed time.
 
-By default uses C<CLOCK_MONOTONIC>. Pass a second argument to select the clock:
-C<'monotonic'> or C<'realtime'>. C<'realtime'> is a measurement of the system's
-uptime, but is succeptible to clock skew: user changes clock, NTP updates time,
-etc. Using C<'realtime'> it is possible (but rate) to have negative time duration
-when comparing two calls.
+The default clock is C<CLOCK_MONOTONIC>. An optional argument selects the
+clock: C<'monotonic'> or C<'realtime'>. C<'realtime'> measures the system's
+uptime but is susceptible to clock skew from user clock changes, NTP updates,
+etc. When using C<'realtime'>, it is possible (but rare) to observe a negative
+duration when comparing two successive calls.
 
 =head1 USAGE
 
@@ -80,7 +80,7 @@ when comparing two calls.
     micros()                      # CLOCK_MONOTONIC, microseconds
     millis()                      # CLOCK_MONOTONIC, milliseconds
 
-	nanos(1)                      # CLOCK_MONOTONIC, list (sec, nsec)
+    nanos(1)                      # CLOCK_MONOTONIC, list (sec, nsec)
     nanos(undef, 'realtime')      # CLOCK_REALTIME, nanoseconds
     nanos(1, 'realtime')          # CLOCK_REALTIME, list (sec, nsec)
 
