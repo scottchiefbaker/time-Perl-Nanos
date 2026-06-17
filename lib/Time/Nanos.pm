@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.1.3';
 our @EXPORT  = qw(nanos micros millis);
 
 require XSLoader;
