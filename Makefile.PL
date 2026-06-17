@@ -44,18 +44,25 @@ C
 }
 
 WriteMakefile(
-    NAME         => 'Time::Nanos',
-    VERSION_FROM => 'lib/Time/Nanos.pm',
-    LIBS         => [$libs],
-    DEFINE       => $define,
-    ABSTRACT     => 'High resolution time via clock_gettime(CLOCK_MONOTONIC)',
-    AUTHOR       => 'Author',
-    LICENSE      => 'perl_5',
-    PREREQ_PM    => {
-        'Exporter' => 0,
-        'XSLoader' => 0,
-    },
-    TEST_REQUIRES => {
-        'Test::More' => 0,
-    },
+	NAME             => 'Time::Nanos',
+	VERSION_FROM     => 'lib/Time/Nanos.pm',
+	ABSTRACT_FROM    => 'lib/Time/Nanos.pm',
+	LIBS             => [$libs],
+	DEFINE           => $define,
+	AUTHOR           => 'Scott Baker <scott@perturb.org>',
+	LICENSE          => 'perl_5',
+	MIN_PERL_VERSION => '5.010',
+	PREREQ_PM        => {
+		'Exporter' => 0,
+		'XSLoader' => 0,
+	},
+	TEST_REQUIRES => {
+		'Test::More' => 0,
+	},
+	META_MERGE => {
+		resources => {
+			repository => 'https://github.com/scottchiefbaker/time-Perl-Nanos',
+			bugtracker => 'https://github.com/scottchiefbaker/time-Perl-Nanos/issues',
+		},
+	},
 );
