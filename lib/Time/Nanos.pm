@@ -28,9 +28,9 @@ Time::Nanos - Nanosecond time resolution via clock_gettime().
 
     use Time::Nanos;
 
-    my $nanoseconds             = nanos();
-    my $microseconds            = micros();
-    my $milliseconds            = millis();
+    my $nanoseconds  = nanos();
+    my $microseconds = micros();
+    my $milliseconds = millis();
 
     my ($seconds, $nanoseconds) = nanos(1);
 
@@ -76,15 +76,15 @@ duration when comparing two successive calls.
 
 =head1 USAGE
 
-    nanos()                       # CLOCK_MONOTONIC, nanoseconds
-    micros()                      # CLOCK_MONOTONIC, microseconds
-    millis()                      # CLOCK_MONOTONIC, milliseconds
+    nanos()                   # CLOCK_MONOTONIC, nanoseconds
+    micros()                  # CLOCK_MONOTONIC, microseconds
+    millis()                  # CLOCK_MONOTONIC, milliseconds
 
-    nanos(1)                      # CLOCK_MONOTONIC, list (sec, nsec)
-    nanos(undef, 'realtime')      # CLOCK_REALTIME, nanoseconds
-    nanos(1, 'realtime')          # CLOCK_REALTIME, list (sec, nsec)
+    nanos(1)                  # CLOCK_MONOTONIC, list (sec, nsec)
+    nanos(undef, 'realtime')  # CLOCK_REALTIME, nanoseconds
+    nanos(1, 'realtime')      # CLOCK_REALTIME, list (sec, nsec)
 
-    micros(undef, 'realtime')     # CLOCK_REALTIME, microseconds
-    millis(undef, 'realtime')     # CLOCK_REALTIME, milliseconds
+    micros(undef, 'realtime') # CLOCK_REALTIME, microseconds
+    millis(undef, 'realtime') # CLOCK_REALTIME, milliseconds
 
 =cut
