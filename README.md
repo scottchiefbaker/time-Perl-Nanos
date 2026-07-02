@@ -16,7 +16,7 @@ my ($seconds, $nanoseconds) = nanos(1);
 
 ## Variables
 
-### $clock
+### $CLOCK
 
 ```
 $Time::Nanos::CLOCK = 'realtime';
