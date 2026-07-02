@@ -83,4 +83,20 @@ my $ms = millis();
 ok(defined $ms, 'millis() returns a value');
 ok($ms > 0, 'milliseconds value is positive');
 
+# micros(1) list context
+my ($us_sec, $us_usec) = micros(1);
+ok(defined $us_sec,  'micros(1) seconds defined');
+ok(defined $us_usec, 'micros(1) microseconds defined');
+ok($us_sec > 0,      'micros(1) seconds is positive');
+ok($us_usec >= 0,    'micros(1) microseconds is non-negative');
+ok($us_usec < 1_000_000, 'micros(1) microseconds < 1e6');
+
+# millis(1) list context
+my ($ms_sec, $ms_msec) = millis(1);
+ok(defined $ms_sec,  'millis(1) seconds defined');
+ok(defined $ms_msec, 'millis(1) milliseconds defined');
+ok($ms_sec > 0,      'millis(1) seconds is positive');
+ok($ms_msec >= 0,    'millis(1) milliseconds is non-negative');
+ok($ms_msec < 1_000, 'millis(1) milliseconds < 1000');
+
 done_testing();

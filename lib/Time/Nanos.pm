@@ -13,9 +13,26 @@ XSLoader::load('Time::Nanos', $VERSION);
 
 sub nanos { hrtime(@_) }
 
-sub micros { int(nanos(@_) / 1000) }
+sub micros {
+	my $ret_array = $_[0] // 0;
 
-sub millis { int(nanos(@_) / 1_000_000) }
+	if ($ret_array) {
+		my ($sec, $nsec) = nanos(1);
+		return ($sec, int($nsec / 1000));
+	}
+
+	return int(nanos() / 1000);
+}
+
+sub millis {
+	my $ret_array = $_[0] // 0;
+
+	if ($ret_array) {
+		my ($sec, $nsec) = nanos(1);
+		return ($sec, int($nsec / 1_000_000));
+	}
+	return int(nanos() / 1_000_000);
+}
 
 1;
 
