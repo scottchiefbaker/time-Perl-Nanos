@@ -76,7 +76,7 @@ hrtime(...)
             {
                 STRLEN len;
                 const char *clock_name;
-                SV *sv = get_sv("Time::Nanos::CLOCK", GV_ADD);
+                SV *sv = get_sv("Time::Nanos::CLOCK", 0);
 
                 if (!sv || !SvOK(sv)) {
                     /* undef → default to monotonic */
