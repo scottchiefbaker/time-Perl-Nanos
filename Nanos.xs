@@ -79,8 +79,7 @@ hrtime(...)
                 SV *sv = get_sv("Time::Nanos::CLOCK", 0);
 
                 if (!sv || !SvOK(sv)) {
-                    /* undef → default to monotonic */
-                    use_realtime = 0;
+                    use_realtime = 1;
                 } else {
                     clock_name = SvPV(sv, len);
                     if (len == 9 && strnEQ(clock_name, "monotonic", 9)) {
