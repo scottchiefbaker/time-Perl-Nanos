@@ -6,6 +6,7 @@ use Exporter 'import';
 
 our $VERSION = 'v0.1.3';
 our @EXPORT  = qw(nanos micros millis);
+our $CLOCK   = 'realtime';
 
 require XSLoader;
 XSLoader::load('Time::Nanos', $VERSION);
@@ -34,6 +35,15 @@ Time::Nanos - Nanosecond time resolution via clock_gettime().
 
     my ($seconds, $nanoseconds) = nanos(1);
 
+=head1 VARIABLES
+
+=head2 $CLOCK
+
+    $Time::Nanos::CLOCK = 'realtime';
+
+Controls which clock source the functions use. Defaults to C<'realtime'>.
+Valid values: C<'monotonic'> or C<'realtime'>.
+
 =head1 FUNCTIONS
 
 =head2 nanos
@@ -41,50 +51,44 @@ Time::Nanos - Nanosecond time resolution via clock_gettime().
     my $ns = nanos();
     my ($sec, $nsec) = nanos(1);
 
-Returns nanoseconds. In scalar context returns total nanoseconds. With optional
-second param returns a list of (seconds, nanoseconds) instead.
-
-Accepts optional arguments: C<nanos($list, $clock)> where C<$list> selects list
-context and C<$clock> is C<'monotonic'> (default) or C<'realtime'>.
+Returns nanoseconds. In scalar context returns total nanoseconds. With a true
+argument returns a list of (seconds, nanoseconds) instead.
 
 =head2 micros
 
     my $us = micros();
 
-Returns microseconds as an integer. Accepts optional clock argument:
-C<micros(undef, 'realtime')>.
+Returns microseconds as an integer.
 
 =head2 millis
 
     my $ms = millis();
 
-Returns milliseconds as an integer. Accepts optional clock argument:
-C<millis(undef, 'realtime')>.
+Returns milliseconds as an integer.
 
 =head1 DESCRIPTION
 
-This module provides high-resolution time via C<clock_gettime()>. The clock
-reference epoch is unspecified, so a single reading is not in itself a useful
-measurement of wall-clock time. These values are only meaningful when compared
-against each other to measure elapsed time.
+This module provides high-resolution time via C<clock_gettime()>.
+The default clock is C<CLOCK_REALTIME>. C<'realtime'> uses the system clock,
+which measures time since the unix epoch. This is susceptible to clock skew from
+NTP updates, user clock changes, etc.  When using C<'realtime'>, it is possible
+(but rare) to observe a negative duration when comparing two successive calls.
 
-The default clock is C<CLOCK_MONOTONIC>. An optional argument selects the
-clock: C<'monotonic'> or C<'realtime'>. C<'realtime'> measures the system's
-uptime but is susceptible to clock skew from user clock changes, NTP updates,
-etc. When using C<'realtime'>, it is possible (but rare) to observe a negative
-duration when comparing two successive calls.
+When using C<'monotonic'> the clock reference epoch is unspecified, so a single
+reading is not in itself a useful measurement of time. These values are only
+meaningful when compared against each other to measure elapsed time.
 
 =head1 USAGE
 
-    nanos()                   # CLOCK_MONOTONIC, nanoseconds
-    micros()                  # CLOCK_MONOTONIC, microseconds
-    millis()                  # CLOCK_MONOTONIC, milliseconds
+    nanos();   # Returns nanoseconds
+    micros()   # Returns microseconds
+    millis()   # Returns milliseconds
 
-    nanos(1)                  # CLOCK_MONOTONIC, list (sec, nsec)
-    nanos(undef, 'realtime')  # CLOCK_REALTIME, nanoseconds
-    nanos(1, 'realtime')      # CLOCK_REALTIME, list (sec, nsec)
+    nanos(1)   # Returns array (seconds, nanos)
+    micros(1)  # Returns array (seconds, micros)
+    millis(1)  # Returns array (seconds, millis)
 
-    micros(undef, 'realtime') # CLOCK_REALTIME, microseconds
-    millis(undef, 'realtime') # CLOCK_REALTIME, milliseconds
+    # Switch to monotonic clock
+    $Time::Nanos::CLOCK = 'monotonic';
 
 =cut

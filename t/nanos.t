@@ -4,6 +4,10 @@ use Test::More;
 
 use Time::Nanos;
 
+# $CLOCK defaults to 'monotonic'
+is($Time::Nanos::CLOCK, 'realtime', '$CLOCK defaults to realtime');
+
+# nanos() basic tests
 ok(defined &nanos, 'nanos is exported');
 
 my $ns = nanos();
@@ -23,29 +27,51 @@ ok(abs($combined - $ns) < 1_000_000, 'combined and scalar values are consistent'
 my $ns2 = nanos();
 ok($ns2 >= $ns, 'monotonic: second call >= first call');
 
-my $rt_ns = nanos(undef, 'realtime');
-ok(defined $rt_ns, 'nanos(undef, realtime) returns a value');
-ok($rt_ns > 0, 'realtime nanoseconds is positive');
+# explicit monotonic via $CLOCK
+{
+    local $Time::Nanos::CLOCK = 'monotonic';
+    my $mono_explicit = nanos();
+    ok(defined $mono_explicit, 'nanos() with explicit monotonic returns a value');
+    ok($mono_explicit > 0, 'explicit monotonic is positive');
+    ok(abs($mono_explicit - nanos()) < 10_000_000, 'explicit monotonic matches default');
+}
 
-my ($rt_sec, $rt_nsec) = nanos(1, 'realtime');
-ok(defined $rt_sec,  'realtime seconds defined');
-ok(defined $rt_nsec, 'realtime nanoseconds component defined');
-ok($rt_sec > 0,      'realtime seconds is positive');
-ok($rt_nsec >= 0,    'realtime nsec component is non-negative');
-ok($rt_nsec < 1_000_000_000, 'realtime nsec component < 1e9');
+# realtime clock via $CLOCK
+{
+    local $Time::Nanos::CLOCK = 'realtime';
 
-my $rt_combined = $rt_sec * 1_000_000_000 + $rt_nsec;
-ok(abs($rt_combined - $rt_ns) < 1_000_000, 'realtime combined and scalar values are consistent');
+    my $rt_ns = nanos();
+    ok(defined $rt_ns, 'realtime nanos() returns a value');
+    ok($rt_ns > 0, 'realtime nanoseconds is positive');
 
-my $mono_explicit = nanos(undef, 'monotonic');
-ok(defined $mono_explicit, 'nanos(undef, monotonic) returns a value');
-ok($mono_explicit > 0, 'explicit monotonic is positive');
-ok(abs($mono_explicit - nanos()) < 10_000_000, 'explicit monotonic matches default');
+    my ($rt_sec, $rt_nsec) = nanos(1);
+    ok(defined $rt_sec,  'realtime seconds defined');
+    ok(defined $rt_nsec, 'realtime nanoseconds component defined');
+    ok($rt_sec > 0,      'realtime seconds is positive');
+    ok($rt_nsec >= 0,    'realtime nsec component is non-negative');
+    ok($rt_nsec < 1_000_000_000, 'realtime nsec component < 1e9');
 
-eval { nanos(undef, 'invalid') };
-ok($@, 'unknown clock source croaks');
-like($@, qr/unknown clock source/, 'error mentions unknown clock source');
+    my $rt_combined = $rt_sec * 1_000_000_000 + $rt_nsec;
+    ok(abs($rt_combined - $rt_ns) < 1_000_000, 'realtime combined and scalar values are consistent');
 
+    my $rt_us = micros();
+    ok(defined $rt_us, 'realtime micros() returns a value');
+    ok($rt_us > 0, 'realtime microseconds is positive');
+
+    my $rt_ms = millis();
+    ok(defined $rt_ms, 'realtime millis() returns a value');
+    ok($rt_ms > 0, 'realtime milliseconds is positive');
+}
+
+# unknown clock source croaks
+{
+    local $Time::Nanos::CLOCK = 'invalid';
+    eval { nanos() };
+    ok($@, 'unknown clock source croaks');
+    like($@, qr/unknown clock source/, 'error mentions unknown clock source');
+}
+
+# micros and millis are exported
 ok(defined &micros, 'micros is exported');
 ok(defined &millis, 'millis is exported');
 
@@ -56,13 +82,5 @@ ok($us > 0, 'microseconds value is positive');
 my $ms = millis();
 ok(defined $ms, 'millis() returns a value');
 ok($ms > 0, 'milliseconds value is positive');
-
-my $rt_us = micros(undef, 'realtime');
-ok(defined $rt_us, 'micros(undef, realtime) returns a value');
-ok($rt_us > 0, 'realtime microseconds is positive');
-
-my $rt_ms = millis(undef, 'realtime');
-ok(defined $rt_ms, 'millis(undef, realtime) returns a value');
-ok($rt_ms > 0, 'realtime milliseconds is positive');
 
 done_testing();
