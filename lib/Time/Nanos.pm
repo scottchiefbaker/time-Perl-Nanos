@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = 'v0.1.4';
+our $VERSION = 'v0.1.5';
 our @EXPORT  = qw(nanos micros millis);
 our $CLOCK   = 'realtime';
 
