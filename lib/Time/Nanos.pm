@@ -63,7 +63,7 @@ Valid values: C<'monotonic'> or C<'realtime'>.
 
 =head1 FUNCTIONS
 
-=head2 nanos
+=head2 nanos()
 
     my $ns = nanos();
     my ($sec, $nsec) = nanos(1);
@@ -71,41 +71,34 @@ Valid values: C<'monotonic'> or C<'realtime'>.
 Returns nanoseconds. In scalar context returns total nanoseconds. With a true
 argument returns a list of (seconds, nanoseconds) instead.
 
-=head2 micros
+=head2 micros()
 
     my $us = micros();
+    my ($sec, $usec) = micros(1);
 
-Returns microseconds as an integer.
+Returns microseconds as an integer. In scalar context returns total
+microseconds. With a true argument returns a list of (seconds, microseconds)
+instead.
 
-=head2 millis
+=head2 millis()
 
     my $ms = millis();
+    my ($sec, $msec) = millis(1);
 
-Returns milliseconds as an integer.
+Returns milliseconds as an integer. In scalar context returns total
+milliseconds. With a true argument returns a list of (seconds, milliseconds)
+instead.
 
 =head1 DESCRIPTION
 
 This module provides high-resolution time via C<clock_gettime()>.
 The default clock is C<CLOCK_REALTIME>. C<'realtime'> uses the system clock,
-which measures time since the unix epoch. This is susceptible to clock skew from
+which measures time since the Unix epoch. This is susceptible to clock skew from
 NTP updates, user clock changes, etc.  When using C<'realtime'>, it is possible
 (but rare) to observe a negative duration when comparing two successive calls.
 
 When using C<'monotonic'> the clock reference epoch is unspecified, so a single
 reading is not in itself a useful measurement of time. These values are only
 meaningful when compared against each other to measure elapsed time.
-
-=head1 USAGE
-
-    nanos();   # Returns nanoseconds
-    micros()   # Returns microseconds
-    millis()   # Returns milliseconds
-
-    nanos(1)   # Returns array (seconds, nanos)
-    micros(1)  # Returns array (seconds, micros)
-    millis(1)  # Returns array (seconds, millis)
-
-    # Switch to monotonic clock
-    $Time::Nanos::CLOCK = 'monotonic';
 
 =cut

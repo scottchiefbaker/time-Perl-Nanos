@@ -41,41 +41,32 @@ argument returns a list of (seconds, nanoseconds) instead.
 
 ```perl
 my $us = micros();
+my ($sec, $usec) = micros(1);
 ```
 
-Returns microseconds as an integer.
+Returns microseconds as an integer. In scalar context returns total
+microseconds. With a true argument returns a list of (seconds, microseconds)
+instead.
 
 ### millis()
 
 ```perl
 my $ms = millis();
+my ($sec, $msec) = millis(1);
 ```
 
-Returns milliseconds as an integer.
+Returns milliseconds as an integer. In scalar context returns total
+milliseconds. With a true argument returns a list of (seconds, milliseconds)
+instead.
 
 ## Description
 
 This module provides high-resolution time via `clock_gettime()`.
 The default clock is `CLOCK_REALTIME`. `'realtime'` uses the system clock,
-which measures time since the unix epoch. This is susceptible to clock skew from
+which measures time since the Unix epoch. This is susceptible to clock skew from
 NTP updates, user clock changes, etc.  When using `'realtime'`, it is possible
 (but rare) to observe a negative duration when comparing two successive calls.
 
 When using `'monotonic'` the clock reference epoch is unspecified, so a single
 reading is not in itself a useful measurement of time. These values are only
 meaningful when compared against each other to measure elapsed time.
-
-## Usage
-
-```
-nanos();   # Returns nanoseconds
-micros()   # Returns microseconds
-millis()   # Returns milliseconds
-
-nanos(1)   # Returns array (seconds, nanos)
-micros(1)  # Returns array (seconds, micros)
-millis(1)  # Returns array (seconds, millis)
-
-# Switch to monotonic clock
-$Time::Nanos::CLOCK = 'monotonic';
-```
