@@ -1,3 +1,15 @@
+/*
+ * Nanos.xs - XS implementation of Time::Nanos
+ *
+ * Provides a single XS function, hrtime(), that returns a high-resolution
+ * timestamp in nanoseconds.  Two backends are supported:
+ *
+ *   HAS_CLOCK_GETTIME - POSIX clock_gettime(2) (Linux, macOS, BSD, ...)
+ *   HAS_WINHR         - Windows high-resolution timers
+ *
+ * If neither is defined at compile time, hrtime() croaks at runtime.
+ */
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -13,6 +25,12 @@
 #include <windows.h>
 #endif
 
+/*
+ * Populate *sec_out / *nsec_out with the current time from the requested
+ * clock source.
+ * use_realtime=1 -> CLOCK_REALTIME  (wall-clock),
+ * use_realtime=0 -> CLOCK_MONOTONIC (time since boot, immune to jumps).
+ */
 #if defined(HAS_CLOCK_GETTIME) || defined(HAS_WINHR)
 static void
 get_hrtime(int use_realtime, uint64_t *sec_out, uint64_t *nsec_out)
@@ -29,15 +47,18 @@ get_hrtime(int use_realtime, uint64_t *sec_out, uint64_t *nsec_out)
     }
 #else
     if (use_realtime) {
+        /* Windows: GetSystemTimePreciseAsFileTime gives 100 ns intervals
+         * since 1601-01-01.  Adjust epoch to 1970-01-01 and convert. */
         FILETIME ft;
         ULARGE_INTEGER ul;
         GetSystemTimePreciseAsFileTime(&ft);
         ul.LowPart  = ft.dwLowDateTime;
         ul.HighPart = ft.dwHighDateTime;
-        ul.QuadPart -= 116444736000000000ULL;
-        *sec_out    = ul.QuadPart / 10000000ULL;
-        *nsec_out   = (ul.QuadPart % 10000000ULL) * 100ULL;
+        ul.QuadPart -= 116444736000000000ULL;                /* 1601 -> 1970 offset */
+        *sec_out    = ul.QuadPart / 10000000ULL;             /* 100 ns -> sec       */
+        *nsec_out   = (ul.QuadPart % 10000000ULL) * 100ULL;  /* remainder -> ns     */
     } else {
+        /* Windows: QueryPerformanceCounter for monotonic time */
         LARGE_INTEGER freq, counter;
         int64_t remainder;
         if (!QueryPerformanceFrequency(&freq)) {
@@ -61,18 +82,30 @@ PROTOTYPES: DISABLE
 void
 hrtime(...)
     PPCODE:
+        /*
+         * Returns a nanosecond-precision timestamp.
+         *
+         * Scalar / no-true-arg -> integer nanoseconds (sec * 1e9 + nsec).
+         * True first argument  -> (seconds, nanoseconds) list.
+         *
+         * Clock source from $Time::Nanos::CLOCK:
+         *   "realtime"  (default) - wall-clock
+         *   "monotonic"           - safe for intervals
+         */
 #if !defined(HAS_CLOCK_GETTIME) && !defined(HAS_WINHR)
         croak("hrtime(): high-resolution clock is not available on this platform");
 #else
         {
             uint64_t sec_part, nsec_part;
-            int want_list = 0;
+            int want_list    = 0;
             int use_realtime = 0;
 
+            /* If first argument is true, return (seconds, nanoseconds) */
             if (items > 0 && SvTRUE(ST(0))) {
                 want_list = 1;
             }
 
+            /* Read $Time::Nanos::CLOCK to choose realtime vs monotonic */
             {
                 STRLEN len;
                 const char *clock_name;
