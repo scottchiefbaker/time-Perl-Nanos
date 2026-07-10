@@ -90,15 +90,6 @@ Time::Nanos - Nanosecond time resolution via clock_gettime().
     my ($seconds, $microseconds) = micros(1);
     my ($seconds, $milliseconds) = millis(1);
 
-=head1 VARIABLES
-
-=head2 $CLOCK
-
-    Time::Nanos::clock_source('monotonic');
-
-Controls which clock source the functions use. Defaults to C<'realtime'>.
-Valid values: C<'realtime'> or C<'monotonic'>.
-
 =head1 FUNCTIONS
 
 =head2 nanos()
@@ -124,6 +115,14 @@ argument, returns a list of (seconds, microseconds) instead.
 
 Returns the current time as an integer number of milliseconds. With a true
 argument, returns a list of (seconds, milliseconds) instead.
+
+=head2 Time::Nanos::clock_source()
+
+    Time::Nanos::clock_source('monotonic');
+
+Selects which clock source the functions use. Defaults to C<'realtime'>.
+Valid values: C<'realtime'> or C<'monotonic'>.
+C<clock_source()> is not exported, so it must be called fully qualified.
 
 =head1 DESCRIPTION
 

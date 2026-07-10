@@ -11,19 +11,10 @@ my $nanoseconds  = nanos();
 my $microseconds = micros();
 my $milliseconds = millis();
 
-my ($seconds, $nanoseconds) = nanos(1);
+my ($seconds, $nanoseconds)  = nanos(1);
+my ($seconds, $microseconds) = micros(1);
+my ($seconds, $milliseconds) = millis(1);
 ```
-
-## Variables
-
-### $CLOCK
-
-```
-$Time::Nanos::CLOCK = 'realtime';
-```
-
-Controls which clock source the functions use. Defaults to `'realtime'`.
-Valid values: `'monotonic'` or `'realtime'`.
 
 ## Functions
 
@@ -34,8 +25,8 @@ my $ns = nanos();
 my ($sec, $nsec) = nanos(1);
 ```
 
-Returns nanoseconds. In scalar context returns total nanoseconds. With a true
-argument returns a list of (seconds, nanoseconds) instead.
+Returns the current time as an integer number of nanoseconds. With a true
+argument, returns a list of (seconds, nanoseconds) instead.
 
 ### micros()
 
@@ -44,9 +35,8 @@ my $us = micros();
 my ($sec, $usec) = micros(1);
 ```
 
-Returns microseconds as an integer. In scalar context returns total
-microseconds. With a true argument returns a list of (seconds, microseconds)
-instead.
+Returns the current time as an integer number of microseconds. With a true
+argument, returns a list of (seconds, microseconds) instead.
 
 ### millis()
 
@@ -55,9 +45,18 @@ my $ms = millis();
 my ($sec, $msec) = millis(1);
 ```
 
-Returns milliseconds as an integer. In scalar context returns total
-milliseconds. With a true argument returns a list of (seconds, milliseconds)
-instead.
+Returns the current time as an integer number of milliseconds. With a true
+argument, returns a list of (seconds, milliseconds) instead.
+
+### Time::Nanos::clock\_Source()
+
+```
+Time::Nanos::clock_source('monotonic');
+```
+
+Selects which clock source the functions use. Defaults to `'realtime'`.
+Valid values: `'realtime'` or `'monotonic'`.
+`clock_source()` is not exported, so it must be called fully qualified.
 
 ## Description
 
