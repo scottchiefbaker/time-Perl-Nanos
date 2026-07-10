@@ -4,10 +4,12 @@ use warnings;
 use Time::Nanos;
 use v5.16;
 
-my $st = stopwatch(1);
-
-#print "Using Time::Nanos " . $Time::Nanos::VERSION . "\n\n";
 printf("Using %s %s\n\n", color('white', 'Time::Nanos'), color(228, $Time::Nanos::VERSION));
+
+################################################################################
+
+#Time::Nanos::clock_source('monotonic');
+my $st = stopwatch(1);
 
 for (1 .. 4) {
 	my $ns = nanos();
