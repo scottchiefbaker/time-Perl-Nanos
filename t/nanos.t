@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Config;
 
 use Time::Nanos;
 
@@ -101,21 +102,33 @@ ok(abs($ms * 1_000_000 - $ns) < 1_000_000, 'millis ~= nanos / 1e6');
     is(scalar @list, 2, 'nanos(true) returns a 2-element list');
 }
 
-# deterministic check via a mocked hrtime(): ns = 1_783_717_664_756_579_651
+# deterministic check via a mocked hrtime().
+# Use a value that fits exactly in a 32-bit UV on 32-bit perls so the split
+# logic is validated exactly everywhere; on 64-bit perls use the real epoch
+# nanosecond count (which a 64-bit UV holds exactly).
 {
-    local *Time::Nanos::hrtime = sub { 1_783_717_664_756_579_651 };
+    my ($mock_ns, $exp_s, $exp_n, $exp_u, $exp_m);
+    if ($Config{uvsize} >= 8) {
+        $mock_ns = 1_783_717_664_756_579_651;
+        ($exp_s, $exp_n, $exp_u, $exp_m) = (1783717664, 756579651, 756579, 756);
+    } else {
+        $mock_ns = 1_234_567_890;
+        ($exp_s, $exp_n, $exp_u, $exp_m) = (1, 234567890, 234567, 234);
+    }
+
+    local *Time::Nanos::hrtime = sub { $mock_ns };
 
     my ($ns_s, $ns_n) = nanos(1);
-    is($ns_s, 1783717664, 'mocked nanos(1) seconds');
-    is($ns_n, 756579651,  'mocked nanos(1) nsec');
+    is($ns_s, $exp_s, 'mocked nanos(1) seconds');
+    is($ns_n, $exp_n, 'mocked nanos(1) nsec');
 
     my ($us_s, $us_u) = micros(1);
-    is($us_s, 1783717664, 'mocked micros(1) seconds');
-    is($us_u, 756579,     'mocked micros(1) usec');
+    is($us_s, $exp_s, 'mocked micros(1) seconds');
+    is($us_u, $exp_u, 'mocked micros(1) usec');
 
     my ($ms_s, $ms_m) = millis(1);
-    is($ms_s, 1783717664, 'mocked millis(1) seconds');
-    is($ms_m, 756,        'mocked millis(1) msec');
+    is($ms_s, $exp_s, 'mocked millis(1) seconds');
+    is($ms_m, $exp_m, 'mocked millis(1) msec');
 }
 
 # clock_source() switches the clock
