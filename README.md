@@ -69,3 +69,6 @@ NTP updates, user clock changes, etc.  When using `'realtime'`, it is possible
 When using `'monotonic'` the clock reference epoch is unspecified, so a single
 reading is not in itself a useful measurement of time. These values are only
 meaningful when compared against each other to measure elapsed time.
+
+On 32-bit Perl builds the nanosecond granularity is around 256 ns rather than
+an exact value. The `(seconds, fraction)` array forms remain usable.
