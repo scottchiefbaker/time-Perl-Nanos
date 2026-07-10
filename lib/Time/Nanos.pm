@@ -6,7 +6,7 @@ use Exporter 'import';
 
 use autouse 'Carp' => qw(croak);
 
-our $VERSION = 'v0.1.6';
+our $VERSION = 'v0.1.7';
 our @EXPORT  = qw(nanos micros millis);
 our $CLOCK   = 0;
 
