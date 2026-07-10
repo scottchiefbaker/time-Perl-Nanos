@@ -80,62 +80,37 @@ MODULE = Time::Nanos    PACKAGE = Time::Nanos
 PROTOTYPES: DISABLE
 
 void
-hrtime(...)
+hrtime(int clock_source)
     PPCODE:
         /*
-         * Returns a nanosecond-precision timestamp.
+         * Returns a nanosecond-precision timestamp as a single integer.
          *
-         * Scalar / no-true-arg -> integer nanoseconds (sec * 1e9 + nsec).
-         * True first argument  -> (seconds, nanoseconds) list.
+         * clock_source:
+         *   0 -> CLOCK_REALTIME  (wall-clock, default)
+         *   1 -> CLOCK_MONOTONIC (time since boot, immune to jumps)
          *
-         * Clock source from $Time::Nanos::CLOCK:
-         *   "realtime"  (default) - wall-clock
-         *   "monotonic"           - safe for intervals
+         * Any other value croaks.
          */
 #if !defined(HAS_CLOCK_GETTIME) && !defined(HAS_WINHR)
         croak("hrtime(): high-resolution clock is not available on this platform");
 #else
         {
             uint64_t sec_part, nsec_part;
-            int want_list    = 0;
             int use_realtime = 0;
 
-            /* If first argument is true, return (seconds, nanoseconds) */
-            if (items > 0 && SvTRUE(ST(0))) {
-                want_list = 1;
-            }
-
-            /* Read $Time::Nanos::CLOCK to choose realtime vs monotonic */
-            {
-                STRLEN len;
-                const char *clock_name;
-                SV *sv = get_sv("Time::Nanos::CLOCK", 0);
-
-                if (!sv || !SvOK(sv)) {
-                    use_realtime = 1;
-                } else {
-                    clock_name = SvPV(sv, len);
-                    if (len == 9 && strnEQ(clock_name, "monotonic", 9)) {
-                        use_realtime = 0;
-                    } else if (len == 8 && strnEQ(clock_name, "realtime", 8)) {
-                        use_realtime = 1;
-                    } else {
-                        croak("hrtime(): unknown clock source '%s' (valid: 'monotonic', 'realtime')", clock_name);
-                    }
-                }
+            if (clock_source == 0) {
+                use_realtime = 1;
+            } else if (clock_source == 1) {
+                use_realtime = 0;
+            } else {
+                croak("hrtime(): invalid clock source %d (valid: 0 = realtime, 1 = monotonic)", clock_source);
             }
 
             get_hrtime(use_realtime, &sec_part, &nsec_part);
 
-            if (want_list) {
-                EXTEND(SP, 2);
-                PUSHs(sv_2mortal(newSVuv((UV)sec_part)));
-                PUSHs(sv_2mortal(newSVuv((UV)nsec_part)));
-            } else {
-                EXTEND(SP, 1);
-                PUSHs(sv_2mortal(newSVuv(
-                    (UV)(sec_part * 1000000000ULL + nsec_part)
-                )));
-            }
+            EXTEND(SP, 1);
+            PUSHs(sv_2mortal(newSVuv(
+                (UV)(sec_part * 1000000000ULL + nsec_part)
+            )));
         }
 #endif

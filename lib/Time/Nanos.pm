@@ -4,34 +4,39 @@ use strict;
 use warnings;
 use Exporter 'import';
 
+use autouse 'Carp' => qw(croak);
+
 our $VERSION = 'v0.1.5';
 our @EXPORT  = qw(nanos micros millis);
-our $CLOCK   = 'realtime';
+our $CLOCK   = 0;
 
 require XSLoader;
 XSLoader::load('Time::Nanos', $VERSION);
 
-sub nanos { hrtime(@_) }
+sub nanos {
+	return hrtime($Time::Nanos::CLOCK);
+}
 
 sub micros {
-	my $ret_array = $_[0] // 0;
-
-	if ($ret_array) {
-		my ($sec, $nsec) = nanos(1);
-		return ($sec, int($nsec / 1000));
-	}
-
 	return int(nanos() / 1000);
 }
 
 sub millis {
-	my $ret_array = $_[0] // 0;
-
-	if ($ret_array) {
-		my ($sec, $nsec) = nanos(1);
-		return ($sec, int($nsec / 1_000_000));
-	}
 	return int(nanos() / 1_000_000);
+}
+
+sub clock_source {
+	my $input = shift();
+
+	if (!defined $input) {
+		croak("clock_source() requires an argument");
+	} elsif ($input eq "realtime" || $input eq "0") {
+		$CLOCK = 0;
+	} elsif ($input eq "monotonic" || $input eq "1") {
+		$CLOCK = 1;
+	} else {
+		croak("Unknown source '$input'");
+	}
 }
 
 1;
@@ -50,44 +55,34 @@ Time::Nanos - Nanosecond time resolution via clock_gettime().
     my $microseconds = micros();
     my $milliseconds = millis();
 
-    my ($seconds, $nanoseconds) = nanos(1);
-
 =head1 VARIABLES
 
 =head2 $CLOCK
 
-    $Time::Nanos::CLOCK = 'realtime';
+    Time::Nanos::clock_source('monotonic');
 
 Controls which clock source the functions use. Defaults to C<'realtime'>.
-Valid values: C<'monotonic'> or C<'realtime'>.
+Valid values: C<'realtime'> or C<'monotonic'>.
 
 =head1 FUNCTIONS
 
 =head2 nanos()
 
     my $ns = nanos();
-    my ($sec, $nsec) = nanos(1);
 
-Returns nanoseconds. In scalar context returns total nanoseconds. With a true
-argument returns a list of (seconds, nanoseconds) instead.
+Returns the current time as an integer number of nanoseconds.
 
 =head2 micros()
 
     my $us = micros();
-    my ($sec, $usec) = micros(1);
 
-Returns microseconds as an integer. In scalar context returns total
-microseconds. With a true argument returns a list of (seconds, microseconds)
-instead.
+Returns the current time as an integer number of microseconds.
 
 =head2 millis()
 
     my $ms = millis();
-    my ($sec, $msec) = millis(1);
 
-Returns milliseconds as an integer. In scalar context returns total
-milliseconds. With a true argument returns a list of (seconds, milliseconds)
-instead.
+Returns the current time as an integer number of milliseconds.
 
 =head1 DESCRIPTION
 
