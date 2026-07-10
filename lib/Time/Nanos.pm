@@ -14,15 +14,46 @@ require XSLoader;
 XSLoader::load('Time::Nanos', $VERSION);
 
 sub nanos {
-	return hrtime($Time::Nanos::CLOCK);
+	my $as_array = shift();
+	my $ns       = hrtime($Time::Nanos::CLOCK);
+
+	if ($as_array) {
+		my $sec  = int($ns / 1_000_000_000);
+		my $nsec = $ns % 1_000_000_000;
+
+		return ($sec, $nsec);
+	}
+
+	return $ns;
 }
 
 sub micros {
-	return int(nanos() / 1000);
+	my $as_array = shift();
+	my $ns = hrtime($Time::Nanos::CLOCK);
+
+	if ($as_array) {
+		my $sec  = int($ns / 1_000_000_000);
+		my $usec = int(($ns % 1_000_000_000) / 1000);
+
+		return ($sec, $usec);
+	}
+
+	my $us = int($ns / 1000);
+	return $us;
 }
 
 sub millis {
-	return int(nanos() / 1_000_000);
+	my $as_array = shift();
+	my $ns = hrtime($Time::Nanos::CLOCK);
+
+	if ($as_array) {
+		my $sec  = int($ns / 1_000_000_000);
+		my $msec = int(($ns % 1_000_000_000) / 1_000_000);
+		return ($sec, $msec);
+	}
+
+	my $ms = int($ns / 1_000_000);
+	return $ms;
 }
 
 sub clock_source {
@@ -55,6 +86,10 @@ Time::Nanos - Nanosecond time resolution via clock_gettime().
     my $microseconds = micros();
     my $milliseconds = millis();
 
+    my ($seconds, $nanoseconds)  = nanos(1);
+    my ($seconds, $microseconds) = micros(1);
+    my ($seconds, $milliseconds) = millis(1);
+
 =head1 VARIABLES
 
 =head2 $CLOCK
@@ -69,20 +104,26 @@ Valid values: C<'realtime'> or C<'monotonic'>.
 =head2 nanos()
 
     my $ns = nanos();
+    my ($sec, $nsec) = nanos(1);
 
-Returns the current time as an integer number of nanoseconds.
+Returns the current time as an integer number of nanoseconds. With a true
+argument, returns a list of (seconds, nanoseconds) instead.
 
 =head2 micros()
 
     my $us = micros();
+    my ($sec, $usec) = micros(1);
 
-Returns the current time as an integer number of microseconds.
+Returns the current time as an integer number of microseconds. With a true
+argument, returns a list of (seconds, microseconds) instead.
 
 =head2 millis()
 
     my $ms = millis();
+    my ($sec, $msec) = millis(1);
 
-Returns the current time as an integer number of milliseconds.
+Returns the current time as an integer number of milliseconds. With a true
+argument, returns a list of (seconds, milliseconds) instead.
 
 =head1 DESCRIPTION
 
