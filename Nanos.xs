@@ -108,9 +108,21 @@ hrtime(int clock_source)
 
             get_hrtime(use_realtime, &sec_part, &nsec_part);
 
-            EXTEND(SP, 1);
-            PUSHs(sv_2mortal(newSVuv(
-                (UV)(sec_part * 1000000000ULL + nsec_part)
-            )));
+            {
+                uint64_t total = sec_part * 1000000000ULL + nsec_part;
+
+                EXTEND(SP, 1);
+#if UVSIZE >= 8
+                /* 64-bit UV (typical): exact integer nanoseconds. */
+                PUSHs(sv_2mortal(newSVuv((UV)total)));
+#else
+                /* 32-bit UV perl: a 64-bit ns cannot fit in UV and a plain
+                 * scalar cannot hold a 64-bit int, so return it as an NV
+                 * (double). This avoids silently wrapping to garbage; the
+                 * value loses precision (~256 ns at the current epoch) but
+                 * stays "close" and keeps the array split sane. */
+                PUSHs(sv_2mortal(newSVnv((NV)total)));
+#endif
+            }
         }
 #endif
