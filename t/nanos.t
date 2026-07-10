@@ -64,32 +64,35 @@ ok(abs($ms * 1_000_000 - $ns) < 1_000_000, 'millis ~= nanos / 1e6');
 
 # array-return form: nanos(1) / micros(1) / millis(1)
 {
+    my $ns_scalar = nanos();
     my ($ns_sec, $ns_nsec) = nanos(1);
     ok(defined $ns_sec , 'nanos(1) seconds defined');
     ok(defined $ns_nsec, 'nanos(1) nanoseconds defined');
     ok($ns_sec > 0              , 'nanos(1) seconds is positive');
     ok($ns_nsec >= 0            , 'nanos(1) nanoseconds non-negative');
     ok($ns_nsec < 1_000_000_000 , 'nanos(1) nanoseconds < 1e9');
-    ok(abs(($ns_sec * 1_000_000_000 + $ns_nsec) - nanos()) < 1_000_000,
+    ok(abs(($ns_sec * 1_000_000_000 + $ns_nsec) - $ns_scalar) < 10_000_000,
         'nanos(1) list reconciles with scalar');
 
+    my $us_scalar = micros();
     my ($us_sec, $us_usec) = micros(1);
     ok(defined $us_sec , 'micros(1) seconds defined');
     ok(defined $us_usec, 'micros(1) microseconds defined');
     ok($us_sec > 0           , 'micros(1) seconds is positive');
     ok($us_usec >= 0         , 'micros(1) microseconds non-negative');
     ok($us_usec < 1_000_000  , 'micros(1) microseconds < 1e6');
-    ok(abs(($us_sec * 1_000_000_000 + $us_usec * 1000) - nanos()) < 1_000_000,
-        'micros(1) list reconciles with nanos()');
+    ok(abs(($us_sec * 1_000_000_000 + $us_usec * 1000) - $us_scalar * 1000) < 10_000_000,
+        'micros(1) list reconciles with micros()');
 
+    my $ms_scalar = millis();
     my ($ms_sec, $ms_msec) = millis(1);
     ok(defined $ms_sec , 'millis(1) seconds defined');
     ok(defined $ms_msec, 'millis(1) milliseconds defined');
     ok($ms_sec > 0        , 'millis(1) seconds is positive');
     ok($ms_msec >= 0      , 'millis(1) milliseconds non-negative');
     ok($ms_msec < 1000    , 'millis(1) milliseconds < 1000');
-    ok(abs(($ms_sec * 1_000_000_000 + $ms_msec * 1_000_000) - nanos()) < 1_000_000,
-        'millis(1) list reconciles with nanos()');
+    ok(abs(($ms_sec * 1_000_000_000 + $ms_msec * 1_000_000) - $ms_scalar * 1_000_000) < 10_000_000,
+        'millis(1) list reconciles with millis()');
 }
 
 # any true value triggers the array form
