@@ -48,7 +48,7 @@ my ($sec, $msec) = millis(1);
 Returns the current time as an integer number of milliseconds. With a true
 argument, returns a list of (seconds, milliseconds) instead.
 
-### Time::Nanos::clock\_Source()
+### Time::Nanos::clock\_source()
 
 ```
 Time::Nanos::clock_source('monotonic');
