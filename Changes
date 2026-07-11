@@ -1,5 +1,12 @@
 Revision history for Perl extension Time-Nanos
 
+v0.1.6  2026-07-10
+    - Replace $CLOCK with a new clock_source() function to set the clock source
+    - Use an NV on 32-bit (UVSIZE = 4) Perls to avoid overflow
+    - Document nanosecond granularity on 32-bit systems
+    - Tweak and widen unit tests to work reliably on 32-bit and slow systems
+    - Update documentation, example, and URLs
+
 v0.1.4  2026-07-02
     - Add option to return (seconds, units) arrays from nanos, micros, millis
     - Add $CLOCK variable for external clock source selection
